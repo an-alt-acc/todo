@@ -14,22 +14,15 @@ load_dotenv()
 app = Flask(__name__)
 
 ## Instantiate your database here:
-class TaskModelBase(Model):
-    id = UnicodeAttribute(hash_key=True, null=False, default_for_new=lambda: str(uuid.uuid4()))
-    title = UnicodeAttribute(null=False)
-    complete = BooleanAttribute(null=False, default_for_new=False)
-
-class ProdTaskModel(TaskModelBase):
+class TaskModel(Model):
     class Meta:
         table_name = "aws_capstone_project_imx-table"
         region = "ap-southeast-1"
 
-class TestTaskModel(TaskModelBase):
-    class Meta:
-        table_name = "aws_capstone_project_imx-test-table"
-        region = "ap-southeast-1"
+    id = UnicodeAttribute(hash_key=True, null=False, default_for_new=lambda: str(uuid.uuid4()))
+    title = UnicodeAttribute(null=False)
+    complete = BooleanAttribute(null=False, default_for_new=False)
 
-TaskModel = TestTaskModel
 
 @app.route("/")
 def home():
@@ -83,8 +76,6 @@ def delete(todo_id):
     return redirect(url_for("home", succ=f"Task deleted"))
 
 if __name__ == "__main__":
-    TaskModel = ProdTaskModel
-
     if not TaskModel.exists():
         print("creating table")
         TaskModel.create_table(read_capacity_units=1, write_capacity_units=1, wait=True)
