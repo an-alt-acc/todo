@@ -6,13 +6,57 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Todo App</title>
 
+    <script src="https://code.jquery.com/jquery-3.7.1.slim.min.js" integrity="sha256-kmHvs0B+OpCW5GVHUNjv9rOmY0IvSIRcf7zGUDTDQM8=" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
     <script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"></script>
+
+    <script>
+        // functionality for x buttons on messages
+        // https://semantic-ui.com/collections/message.html
+        window.addEventListener("load", () => {
+            $('.message .close')
+            .on('click', function() {
+                $(this)
+                .closest('.message')
+                .transition('fade')
+                ;
+            });
+        })
+    </script>
+
+    <script defer>
+        // remove err and succ query parameters
+        // https://stackoverflow.com/a/43440356
+        let params = new URLSearchParams(location.search)
+        params.delete('err')
+        params.delete('succ')
+        history.replaceState(null, '', "?" + params + location.hash)
+    </script>
 </head>
 
 <body>
     <div style="margin-top: 50px;" class="ui container">
         <h1 class="ui center aligned header">To Do App</h1>
+        
+        {% if err %}
+        <div class="ui negative message">
+            <i class="close icon"></i>
+            <div class="header">
+                An error occured
+            </div>
+            <p>{{ err }}</p>
+        </div>
+        {% endif %}
+
+        {% if succ %}
+        <div class="ui positive message">
+            <i class="close icon"></i>
+            <div class="header">
+                Success
+            </div>
+            <p>{{ succ }}</p>
+        </div>
+        {% endif %}
 
         <form class="ui form" action="/add" method="post">
             <div class="field">
