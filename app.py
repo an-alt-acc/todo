@@ -30,7 +30,22 @@ def home():
     # The todo_list variable should be returned by running a scan on your DDB table,
     # which is then converted to a list
     todo_list = list(TaskModel.scan())
-    todo_list.sort(key=lambda i: i.creation_date)
+    
+    if (sort_by := request.args.get("sort_by")) is not None:
+        descending = request.args.get("descending")
+        match sort_by:
+            case "title":
+                todo_list.sort(key=lambda i: i.title, reverse=descending)
+            case "complete":
+                todo_list.sort(key=lambda i: i.complete, reverse=descending)
+            case "creation_date":
+                todo_list.sort(key=lambda i: i.creation_date, reverse=descending)
+            case _:
+                return redirect(url_for("home", err=f"Invalid sort key {sort_by}"))
+    else:
+        todo_list.sort(key=lambda i: i.creation_date)
+
+
     err = request.args.get("err")
     succ = request.args.get("succ")
 
