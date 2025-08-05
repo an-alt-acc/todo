@@ -6,7 +6,7 @@ from pynamodb.attributes import UnicodeAttribute, BooleanAttribute, UTCDateTimeA
 import os
 import uuid
 from dotenv import load_dotenv
-from datetime import datetime, UTC
+from datetime import datetime
 #
 #
 
@@ -23,7 +23,7 @@ class TaskModel(Model):
     id = UnicodeAttribute(hash_key=True, null=False, default_for_new=lambda: str(uuid.uuid4()))
     title = UnicodeAttribute(null=False)
     complete = BooleanAttribute(null=False, default_for_new=False)
-    creation_date = UTCDateTimeAttribute(null=False, default_for_new=lambda: datetime.now(UTC))
+    creation_date = UTCDateTimeAttribute(null=False, default_for_new=lambda: datetime.now())
 
 
 @app.route("/")
