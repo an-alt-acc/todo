@@ -15,9 +15,6 @@ app = Flask(__name__)
 
 ## Instantiate your database here:
 class TaskModel(Model):
-    """
-    A DynamoDB User
-    """
     class Meta:
         table_name = "aws_capstone_project_imx-table"
         region = "ap-southeast-1"
@@ -26,11 +23,6 @@ class TaskModel(Model):
     title = UnicodeAttribute(null=False)
     complete = BooleanAttribute(null=False, default_for_new=False)
 
-if not TaskModel.exists():
-    print("creating table")
-    TaskModel.create_table(read_capacity_units=1, write_capacity_units=1, wait=True)
-else:
-    print("table is ready")
 
 @app.route("/")
 def home():
@@ -38,18 +30,23 @@ def home():
     # The todo_list variable should be returned by running a scan on your DDB table,
     # which is then converted to a list
     todo_list = list(TaskModel.scan())
+    err = request.args.get("err")
+    succ = request.args.get("succ")
 
     # can leave this line as is to use the template that's provided
-    return render_template("base.html", todo_list=todo_list)
+    return render_template("base.html", todo_list=todo_list, err=err, succ=succ)
 
 
 @app.route("/add", methods=["POST"])
 def add():
     title = request.form.get("title")
     # Complete code below to create a new item in your todo list
+    if len(title) == 0:
+        return redirect(url_for("home", err="Title cannot be empty"))
+    
     TaskModel(title=title).save()
 
-    return redirect(url_for("home"))
+    return redirect(url_for("home", succ="Task added"))
 
 
 
@@ -57,19 +54,32 @@ def add():
 def update(todo_id):
     # Complete the code below to update an existing item
     # For this particular app, updating just toggles the completion between True / False
-    task = TaskModel.get(todo_id)
+    try:
+        task = TaskModel.get(todo_id)
+    except TaskModel.DoesNotExist:
+        return redirect(url_for("home", err=f"Task {todo_id} does not exist"))
+    
     task.complete = not task.complete
     task.save()
 
-    return redirect(url_for("home"))
+    return redirect(url_for("home", succ=f"Task marked as {'complete' if task.complete else 'incomplete'}"))
 
 
 @app.route("/delete/<todo_id>")
 def delete(todo_id):
     # Complete the code below to delete an item from the to-do list
-    task = TaskModel.get(todo_id).delete()
+    try:
+        TaskModel.get(todo_id).delete()
+    except TaskModel.DoesNotExist:
+        return redirect(url_for("home", err=f"Task {todo_id} does not exist"))
 
-    return redirect(url_for("home"))
+    return redirect(url_for("home", succ=f"Task deleted"))
 
 if __name__ == "__main__":
+    if not TaskModel.exists():
+        print("creating table")
+        TaskModel.create_table(read_capacity_units=1, write_capacity_units=1, wait=True)
+    else:
+        print("table is ready")
+
     app.run(debug=True, host="0.0.0.0", port=os.environ.get("PORT", 5000))
