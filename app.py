@@ -1,11 +1,12 @@
 from flask import Flask, render_template, request, redirect, url_for
 from pynamodb.models import Model
-from pynamodb.attributes import UnicodeAttribute, BooleanAttribute
+from pynamodb.attributes import UnicodeAttribute, BooleanAttribute, UTCDateTimeAttribute
 # You will likely need a database e.g. DynamoDB so you might either boto3 or pynamodb
 # Additional installs here:
 import os
 import uuid
 from dotenv import load_dotenv
+from datetime import datetime, UTC
 #
 #
 
@@ -22,6 +23,7 @@ class TaskModel(Model):
     id = UnicodeAttribute(hash_key=True, null=False, default_for_new=lambda: str(uuid.uuid4()))
     title = UnicodeAttribute(null=False)
     complete = BooleanAttribute(null=False, default_for_new=False)
+    creation_date = UTCDateTimeAttribute(null=False, default_for_new=lambda: datetime.now(UTC))
 
 
 @app.route("/")
@@ -30,6 +32,7 @@ def home():
     # The todo_list variable should be returned by running a scan on your DDB table,
     # which is then converted to a list
     todo_list = list(TaskModel.scan())
+    todo_list.sort(key=lambda i: i.creation_date)
     err = request.args.get("err")
     succ = request.args.get("succ")
 
