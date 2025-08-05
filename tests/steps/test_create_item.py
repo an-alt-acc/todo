@@ -7,14 +7,11 @@ from tests.steps.conftest import get_query_param
 
 scenarios("../features/create_item.feature")
 
-@given("my to-do list is empty")
-def _(TestTaskModel: type[TaskModel]):
-    assert len(list(TestTaskModel.scan())) == 0
-
 
 @when(parsers.parse('I add an item with title "{title}"'), target_fixture="add_response")
 def _(client: FlaskClient, title):
     response = client.post("/add", data={"title": title})
+    assert response.status_code == 302
     return response
 
 

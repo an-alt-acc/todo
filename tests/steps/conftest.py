@@ -1,5 +1,7 @@
 import pytest
 import uuid
+
+from pytest_bdd import given, parsers
 from app import app, TaskModel
 from urllib import parse
 
@@ -23,3 +25,19 @@ def TestTaskModel():
 def client():
     app.config.update({"TESTING": True})
     return app.test_client()
+
+
+@given("my to-do list is empty")
+def _(TestTaskModel: type[TaskModel]):
+    assert len(list(TestTaskModel.scan())) == 0
+
+@given(parsers.parse('the list contains items: {titles}'), target_fixture="pre_added_items")
+def _(TestTaskModel: type[TaskModel], titles):
+    titles = [t.strip('"') for t in titles.split(", ")]
+    items = []
+    for title in titles:
+        item = TestTaskModel(title=title)
+        item.save()
+        items.append(item)
+    assert len(list(TestTaskModel.scan())) == len(titles)
+    return items

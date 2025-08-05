@@ -6,12 +6,7 @@ from bs4 import BeautifulSoup, ResultSet, Tag
 
 scenarios("../features/read_items.feature")
 
-@given(parsers.parse('the list contains items: {titles}'))
-def _(TestTaskModel: type[TaskModel], titles):
-    titles = [t.strip('"') for t in titles.split(", ")]
-    for title in titles:
-        TestTaskModel(title=title).save()
-    assert len(list(TestTaskModel.scan())) == 2
+
 
 
 @when("I load the page", target_fixture="page_response")
