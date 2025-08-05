@@ -72,6 +72,8 @@
         <div class="ui segment">
             <p class="ui big header">{{ todo.title }}</p>
 
+            <span class="ui tiny"><details>Created at: {{ todo.creation_date.strftime('%Y-%m-%d %H:%M') }} | ID: {{ todo.id }}</details></span>
+
             {% if todo.complete == False %}
             <span class="ui gray label">Not Complete</span>
             {% else %}
