@@ -25,6 +25,8 @@
   - 1 Application Load Balancer on a VPC with _n_ public subnets across _n_ AZs
     - Listen on port 80 and set target group port to 5000
   
+Upon commit push, CodePipeline will detect the pushes and test, build and upload the Docker image automatically. Manual approval ("quick service update") will be required on ECS to deploy the latest image.
+
 ## Development
 To set up your environment, (create a virtual environment and) run `pip install -r requirements/dev.txt`
 
