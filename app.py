@@ -7,8 +7,6 @@ import os
 import uuid
 from dotenv import load_dotenv
 from datetime import datetime
-#
-#
 
 load_dotenv()
 
@@ -17,8 +15,8 @@ app = Flask(__name__)
 ## Instantiate your database here:
 class TaskModel(Model):
     class Meta:
-        table_name = "aws_capstone_project_imx-table"
-        region = "ap-southeast-1"
+        table_name = os.environ.get("TABLE_NAME", "todo-table")
+        region = os.environ.get("REGION", "ap-southeast-1")
 
     id = UnicodeAttribute(hash_key=True, null=False, default_for_new=lambda: str(uuid.uuid4()))
     title = UnicodeAttribute(null=False)
