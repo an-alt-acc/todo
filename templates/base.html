@@ -10,6 +10,7 @@
       integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
       crossorigin="anonymous"
     ></script>
+
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css"
@@ -64,12 +65,30 @@
 
       <hr />
 
+      <details>
+        <summary style="cursor: pointer; user-select: none;"><big>Sort by...</big></summary>
+
+        {% for sort_by, display in [
+          ("title", "Title"),
+          ("complete", "Completion State"),
+          ("creation_date", "Creation Date")
+        ] %}
+        <div style="display: inline">
+          <big style="margin: 0 1em 0 1em">{{ display }}</big>
+          <div class="ui icon buttons">
+            <a href="/?sort_by={{ sort_by }}", class="tiny ui icon button"><i class="arrow up icon"></i></a>
+            <a href="/?sort_by={{ sort_by }}&descending=1", class="tiny ui icon button"><i class="arrow down icon"></i></a>
+          </div>
+        </div>
+        {% endfor %}
+      </details>
+
       {% for todo in todo_list %}
       <div class="ui segment">
         <p class="ui big header">{{ todo.title }}</p>
 
         <span class="ui tiny">
-          <details>
+          <details style="cursor: pointer; user-select: none;">
             Created at: {{ todo.creation_date.strftime('%Y-%m-%d %H:%M') }} |
             ID: {{ todo.id }}
           </details>
